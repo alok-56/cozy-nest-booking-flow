@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
-import { useSettings } from '@/contexts/SettingsContext';
+
 
 const Footer = () => {
-  const { settings } = useSettings();
   return (
     <footer className="bg-gray-900 text-white">
       <div className="container mx-auto px-4 py-12">
@@ -14,19 +13,19 @@ const Footer = () => {
               <div className="w-10 h-10 primary-gradient rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-xl">H</span>
               </div>
-              <span className="text-xl font-bold">{settings.branding.siteName}</span>
+              <span className="text-xl font-bold">HotelBook</span>
             </div>
             <p className="text-gray-400 leading-relaxed">
-              {settings.content.aboutContent}
+              We are a leading hotel booking platform dedicated to providing exceptional travel experiences.
             </p>
             <div className="flex space-x-4">
-              <a href={settings.contact.social.facebook} className="text-gray-400 hover:text-primary transition-colors">
+              <a href="https://facebook.com/hotelbook" className="text-gray-400 hover:text-primary transition-colors">
                 <Facebook size={20} />
               </a>
-              <a href={settings.contact.social.twitter} className="text-gray-400 hover:text-primary transition-colors">
+              <a href="https://twitter.com/hotelbook" className="text-gray-400 hover:text-primary transition-colors">
                 <Twitter size={20} />
               </a>
-              <a href={settings.contact.social.instagram} className="text-gray-400 hover:text-primary transition-colors">
+              <a href="https://instagram.com/hotelbook" className="text-gray-400 hover:text-primary transition-colors">
                 <Instagram size={20} />
               </a>
             </div>
@@ -62,15 +61,15 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <Phone size={16} className="text-primary" />
-                <span className="text-gray-400">{settings.contact.phone}</span>
+                <span className="text-gray-400">+1 (555) 123-4567</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail size={16} className="text-primary" />
-                <span className="text-gray-400">{settings.contact.email}</span>
+                <span className="text-gray-400">contact@hotelbook.com</span>
               </div>
               <div className="flex items-center space-x-3">
                 <MapPin size={16} className="text-primary" />
-                <span className="text-gray-400">{settings.contact.address}</span>
+                <span className="text-gray-400">123 Business Street, Suite 100, City, State 12345</span>
               </div>
             </div>
           </div>
@@ -78,7 +77,7 @@ const Footer = () => {
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-gray-400">
-            © 2024 {settings.branding.siteName}. All rights reserved. | Built with ❤️ for travelers worldwide
+            © 2024 HotelBook. All rights reserved. | Built with ❤️ for travelers worldwide
           </p>
         </div>
       </div>

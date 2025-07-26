@@ -2,12 +2,11 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Phone, Mail, User, ShoppingCart, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useSettings } from '@/contexts/SettingsContext';
+
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const { settings } = useSettings();
 
   const navItems = [
     { name: 'Home', path: '/' },
@@ -28,7 +27,7 @@ const Header = () => {
             <div className="w-10 h-10 primary-gradient rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">H</span>
             </div>
-            <span className="text-xl font-bold text-primary">{settings.branding.siteName}</span>
+            <span className="text-xl font-bold text-primary">HotelBook</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -48,15 +47,12 @@ const Header = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <a href={`tel:${settings.contact.phone}`} className="text-muted-foreground hover:text-primary transition-colors">
+            <a href="tel:+1 (555) 123-4567" className="text-muted-foreground hover:text-primary transition-colors">
               <Phone size={20} />
             </a>
-            <a href={`mailto:${settings.contact.email}`} className="text-muted-foreground hover:text-primary transition-colors">
+            <a href="mailto:contact@hotelbook.com" className="text-muted-foreground hover:text-primary transition-colors">
               <Mail size={20} />
             </a>
-            <Link to="/settings" className="text-muted-foreground hover:text-primary transition-colors">
-              <Settings size={20} />
-            </Link>
             <Link to="/my-bookings">
               <Button variant="outline" size="sm">
                 <User size={16} className="mr-2" />
