@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Calendar, MapPin, Users, Download, Star, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -260,9 +261,11 @@ const MyBookings = () => {
                 <CardContent className="p-8 text-center">
                   <h3 className="text-xl font-semibold mb-2">No Upcoming Bookings</h3>
                   <p className="text-muted-foreground mb-4">Ready to plan your next adventure?</p>
-                  <Button className="primary-gradient">
-                    Browse Hotels
-                  </Button>
+                  <Link to="/hotels">
+                    <Button className="primary-gradient">
+                      Browse Hotels
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             )}

@@ -158,9 +158,11 @@ const HotelDetails = () => {
                       <option>4 Adults</option>
                     </select>
                   </div>
-                  <Button className="w-full primary-gradient hover-lift">
-                    Check Availability
-                  </Button>
+                  <Link to="/rooms">
+                    <Button className="w-full primary-gradient hover-lift">
+                      Check Availability
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>

@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Calendar, MapPin, Users, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 
 const SearchBox = ({ onSearch }: { onSearch?: (searchData: any) => void }) => {
+  const navigate = useNavigate();
   const [searchData, setSearchData] = useState({
     location: '',
     checkIn: '',
@@ -15,6 +17,9 @@ const SearchBox = ({ onSearch }: { onSearch?: (searchData: any) => void }) => {
   const handleSearch = () => {
     if (onSearch) {
       onSearch(searchData);
+    } else {
+      // Navigate to hotels page with search parameters
+      navigate('/hotels', { state: searchData });
     }
   };
 

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Star, MapPin, Filter, Grid, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -106,9 +107,11 @@ const Hotels = () => {
           </div>
           <div className="text-right">
             <div className="text-sm text-muted-foreground">{hotel.reviews} reviews</div>
-            <Button className="mt-2 primary-gradient hover-lift">
-              View Rooms
-            </Button>
+            <Link to={`/hotel/${hotel.id}`}>
+              <Button className="mt-2 primary-gradient hover-lift">
+                View Details
+              </Button>
+            </Link>
           </div>
         </div>
       </CardContent>

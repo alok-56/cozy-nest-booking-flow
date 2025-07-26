@@ -9,7 +9,7 @@ const Header = () => {
   const location = useLocation();
 
   const navItems = [
-    { name: 'Home', path: '/' },
+    { name: 'Home', path: '/home' },
     { name: 'Hotels', path: '/hotels' },
     { name: 'B2B', path: '/b2b' },
     { name: 'About', path: '/about' },
@@ -23,7 +23,7 @@ const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/home" className="flex items-center space-x-2">
             <div className="w-10 h-10 primary-gradient rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">H</span>
             </div>

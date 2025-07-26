@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CreditCard, Lock, ArrowLeft, Check } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const Checkout = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     // Guest Information
@@ -88,7 +89,7 @@ const Checkout = () => {
       
       // Redirect to confirmation or bookings page
       setTimeout(() => {
-        window.location.href = '/my-bookings';
+        navigate('/my-bookings');
       }, 2000);
     }, 3000);
   };

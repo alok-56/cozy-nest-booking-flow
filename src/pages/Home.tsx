@@ -1,6 +1,7 @@
 import { Star, Users, Shield, Clock, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Link } from 'react-router-dom';
 import SearchBox from '@/components/SearchBox';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -42,9 +43,11 @@ const Home = () => {
           <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto animate-slide-up">
             Discover amazing hotels, resorts, and accommodations for your next adventure. Book with confidence and travel with ease.
           </p>
-          <Button size="lg" className="secondary-gradient text-foreground hover-lift animate-scale-in">
-            Explore Hotels
-          </Button>
+          <Link to="/hotels">
+            <Button size="lg" className="secondary-gradient text-foreground hover-lift animate-scale-in">
+              Explore Hotels
+            </Button>
+          </Link>
         </div>
         
         {/* Search Box Overlay */}
@@ -192,9 +195,11 @@ const Home = () => {
                     <div className="text-sm text-muted-foreground">1250 reviews</div>
                   </div>
                 </div>
-                <Button className="w-full mt-4 primary-gradient hover-lift">
-                  View Details
-                </Button>
+                <Link to="/hotel/1">
+                  <Button className="w-full mt-4 primary-gradient hover-lift">
+                    View Details
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
             <Card className="hotel-card hover-lift overflow-hidden animate-scale-in" style={{ animationDelay: '0.1s' }}>
@@ -219,9 +224,11 @@ const Home = () => {
                     <div className="text-sm text-muted-foreground">890 reviews</div>
                   </div>
                 </div>
-                <Button className="w-full mt-4 primary-gradient hover-lift">
-                  View Details
-                </Button>
+                <Link to="/hotel/2">
+                  <Button className="w-full mt-4 primary-gradient hover-lift">
+                    View Details
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
             <Card className="hotel-card hover-lift overflow-hidden animate-scale-in" style={{ animationDelay: '0.2s' }}>
@@ -246,9 +253,11 @@ const Home = () => {
                     <div className="text-sm text-muted-foreground">567 reviews</div>
                   </div>
                 </div>
-                <Button className="w-full mt-4 primary-gradient hover-lift">
-                  View Details
-                </Button>
+                <Link to="/hotel/3">
+                  <Button className="w-full mt-4 primary-gradient hover-lift">
+                    View Details
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </div>
