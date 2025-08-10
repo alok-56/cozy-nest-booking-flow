@@ -1,0 +1,1 @@
+export const BASEURL = 'https://brills-backend.vercel.app/api/v1'
