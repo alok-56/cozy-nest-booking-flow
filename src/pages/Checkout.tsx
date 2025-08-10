@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CreditCard, Lock, ArrowLeft, Check } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,11 +8,16 @@ import { Checkbox } from '@/components/ui/checkbox';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useToast } from '@/hooks/use-toast';
+import { createBooking } from '@/api/Services/api';
 
 const Checkout = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  
+  const { hotel, room, checkIn, checkOut } = location.state || {};
   const [formData, setFormData] = useState({
     // Guest Information
     firstName: '',
@@ -39,19 +44,30 @@ const Checkout = () => {
     subscribeNewsletter: false,
   });
 
+  // Calculate booking details
+  const calculateStayDuration = () => {
+    if (!checkIn || !checkOut) return 1;
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  };
+  
+  const nights = calculateStayDuration();
+  const roomPrice = room?.pricing?.basePrice || room?.price || 199;
+  const subtotal = roomPrice * nights;
+  const taxes = subtotal * 0.12; // 12% tax
+  const total = subtotal + taxes;
+
   const bookingDetails = {
-    hotel: 'Grand Plaza Hotel',
-    rooms: [
-      { name: 'Deluxe Room', quantity: 2, price: 199, nights: 3 },
-      { name: 'Executive Suite', quantity: 1, price: 299, nights: 3 },
-    ],
-    checkIn: '2024-03-15',
-    checkOut: '2024-03-18',
-    guests: '2 Adults',
-    subtotal: 2094,
-    taxes: 251.28,
-    discount: 0,
-    total: 2345.28,
+    hotel: hotel?.name || 'Hotel',
+    room: room?.name || 'Room',
+    checkIn: checkIn || new Date().toISOString().split('T')[0],
+    checkOut: checkOut || new Date().toISOString().split('T')[0],
+    nights,
+    roomPrice,
+    subtotal,
+    taxes,
+    total,
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -74,24 +90,64 @@ const Checkout = () => {
       return;
     }
 
-    // Simulate payment processing
-    toast({
-      title: "Processing Payment...",
-      description: "Please wait while we process your booking.",
-    });
-
-    // Simulate API call
-    setTimeout(() => {
+    if (!hotel || !room) {
       toast({
-        title: "Booking Confirmed! 🎉",
-        description: "Your hotel booking has been confirmed. Check your email for details.",
+        title: "Booking Error",
+        description: "Hotel or room information is missing.",
+        variant: "destructive",
       });
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      const bookingPayload = {
+        hotelId: hotel._id,
+        roomId: [room._id],
+        checkInDate: checkIn,
+        checkOutDate: checkOut,
+        userInfo: [{
+          name: `${formData.firstName} ${formData.lastName}`,
+          phone: formData.phone,
+          email: formData.email,
+          age: 25, // Default age
+        }],
+        guests: { adults: 2, children: 0 },
+        addOns: [],
+        couponCode: '',
+        discountAmount: 0,
+        taxAmount: bookingDetails.taxes,
+        totalAmount: bookingDetails.total,
+        pendingAmount: bookingDetails.total,
+        amountPaid: 0,
+        userId: null,
+      };
+
+      toast({
+        title: "Processing Payment...",
+        description: "Please wait while we process your booking.",
+      });
+
+      const response = await createBooking(bookingPayload);
       
-      // Redirect to confirmation or bookings page
-      setTimeout(() => {
-        navigate('/my-bookings');
-      }, 2000);
-    }, 3000);
+      if (response?.data) {
+        // Redirect to payment gateway
+        window.location.href = response.data;
+      } else {
+        throw new Error('Failed to create booking');
+      }
+      
+    } catch (error) {
+      console.error('Booking error:', error);
+      toast({
+        title: "Booking Failed",
+        description: "There was an error processing your booking. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -100,10 +156,10 @@ const Checkout = () => {
       
       <div className="container mx-auto px-4 py-8">
         {/* Back Button */}
-        <Link to="/cart">
+        <Link to={`/hotel/${hotel?._id}`}>
           <Button variant="outline" className="mb-6">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Cart
+            Back to Hotel
           </Button>
         </Link>
 
@@ -357,10 +413,10 @@ const Checkout = () => {
               <Button 
                 type="submit" 
                 className="w-full primary-gradient hover-lift py-6 text-lg"
-                disabled={!formData.agreeToTerms}
+                disabled={!formData.agreeToTerms || loading}
               >
                 <Lock className="w-5 h-5 mr-2" />
-                Complete Booking - ${bookingDetails.total.toFixed(2)}
+                {loading ? 'Processing...' : `Complete Booking - $${bookingDetails.total.toFixed(2)}`}
               </Button>
             </form>
           </div>
@@ -377,20 +433,18 @@ const Checkout = () => {
                     <p className="text-sm text-muted-foreground">
                       {bookingDetails.checkIn} - {bookingDetails.checkOut}
                     </p>
-                    <p className="text-sm text-muted-foreground">{bookingDetails.guests}</p>
+                    <p className="text-sm text-muted-foreground">{bookingDetails.nights} nights</p>
                   </div>
                   
-                  {bookingDetails.rooms.map((room, index) => (
-                    <div key={index} className="border-l-2 border-primary pl-3">
-                      <p className="font-medium">{room.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {room.quantity} room(s) × {room.nights} nights × ${room.price}
-                      </p>
-                      <p className="text-sm font-medium">
-                        ${room.quantity * room.nights * room.price}
-                      </p>
-                    </div>
-                  ))}
+                  <div className="border-l-2 border-primary pl-3">
+                    <p className="font-medium">{bookingDetails.room}</p>
+                    <p className="text-sm text-muted-foreground">
+                      1 room × {bookingDetails.nights} nights × ${bookingDetails.roomPrice}
+                    </p>
+                    <p className="text-sm font-medium">
+                      ${bookingDetails.subtotal.toFixed(2)}
+                    </p>
+                  </div>
                 </div>
 
                 <div className="space-y-2 border-t pt-4">

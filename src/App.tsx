@@ -7,9 +7,8 @@ import Index from "./pages/Index";
 import Home from "./pages/Home";
 import Hotels from "./pages/Hotels";
 import HotelDetails from "./pages/HotelDetails";
-import Rooms from "./pages/Rooms";
-import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import PaymentValidation from './pages/PaymentValidation';
 import MyBookings from "./pages/MyBookings";
 import B2B from "./pages/B2B";
 import About from "./pages/About";
@@ -31,9 +30,8 @@ const App = () => (
           <Route path="/home" element={<Home />} />
           <Route path="/hotels" element={<Hotels />} />
           <Route path="/hotel/:id" element={<HotelDetails />} />
-          <Route path="/rooms" element={<Rooms />} />
-          <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/payment-validation/:merchantTransactionId" element={<PaymentValidation />} />
           <Route path="/my-bookings" element={<MyBookings />} />
           <Route path="/b2b" element={<B2B />} />
           <Route path="/about" element={<About />} />
