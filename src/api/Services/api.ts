@@ -106,3 +106,17 @@ export const createContact = async (payload: any): Promise<any> => {
 
   return data;
 };
+
+// get my booking
+export const Getmybooking = async (number: any): Promise<any> => {
+  const res = await fetch(`${BASEURL}/booking/mybooking?Number=${number}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await res.json();
+
+  return data;
+};
