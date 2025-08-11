@@ -28,7 +28,7 @@ const HotelDetails = () => {
     checkIn: searchParams.get('checkIn') || '',
     checkOut: searchParams.get('checkOut') || ''
   });
-  const [selectedRooms, setSelectedRooms] = useState({});
+  const [selectedRooms, setSelectedRooms] = useState<Record<string, number>>({});
 
   useEffect(() => {
     const fetchHotelDetails = async () => {
@@ -160,7 +160,7 @@ const HotelDetails = () => {
   };
 
   // Room selection functions
-  const updateRoomQuantity = (roomId, quantity) => {
+  const updateRoomQuantity = (roomId: string, quantity: number) => {
     setSelectedRooms(prev => {
       if (quantity === 0) {
         const { [roomId]: removed, ...rest } = prev;
@@ -174,20 +174,20 @@ const HotelDetails = () => {
   };
 
   const getTotalSelectedRooms = () => {
-    return Object.values(selectedRooms).reduce((sum, qty) => sum + qty, 0);
+    return Object.values(selectedRooms).reduce((sum, qty) => sum + (qty as number), 0);
   };
 
   const getTotalPrice = () => {
     return rooms.reduce((total, room) => {
-      const quantity = selectedRooms[room._id] || 0;
+      const quantity = (selectedRooms[room._id] as number) || 0;
       return total + (room.price * quantity);
     }, 0);
   };
 
   const getSelectedRoomsData = () => {
-    return rooms.filter(room => selectedRooms[room._id] > 0).map(room => ({
+    return rooms.filter(room => (selectedRooms[room._id] as number) > 0).map(room => ({
       ...room,
-      quantity: selectedRooms[room._id]
+      quantity: selectedRooms[room._id] as number
     }));
   };
 
@@ -315,7 +315,7 @@ const HotelDetails = () => {
                 </Button>
                 
                 {/* Selected Rooms Summary */}
-                {getTotalSelectedRooms() > 0 && (
+                  {getTotalSelectedRooms() > 0 && (
                   <div className="pt-4 border-t">
                     <h4 className="font-medium mb-3">Selected Rooms</h4>
                     <div className="space-y-2 max-h-32 overflow-y-auto">
@@ -670,7 +670,7 @@ const HotelDetails = () => {
                         ))}
                       </div>
                       <div className="pt-2 mt-2 border-t flex justify-between items-center font-semibold">
-                        <span>Total ({getTotalSelectedRooms()} rooms)</span>
+                      <span>Total ({getTotalSelectedRooms()} rooms)</span>
                         <span className="text-primary">₹{getTotalPrice()}</span>
                       </div>
                       <Link 

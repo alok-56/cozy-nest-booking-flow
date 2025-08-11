@@ -216,7 +216,7 @@ const Home = () => {
                     alt={place.name}
                     className="w-full h-48 object-cover"
                     onError={(e) => {
-                      e.target.src = "/placeholder.svg";
+                      (e.target as HTMLImageElement).src = "/placeholder.svg";
                     }}
                   />
                   <div className="absolute top-3 left-3 bg-primary/90 text-white px-2 py-1 rounded text-sm">
@@ -285,7 +285,7 @@ const Home = () => {
                       alt={hotel.hotelName}
                       className="w-full h-64 object-cover"
                       onError={(e) => {
-                        e.target.src = "/placeholder.svg";
+                        (e.target as HTMLImageElement).src = "/placeholder.svg";
                       }}
                     />
                     <div className="absolute top-4 right-4 bg-white/90 px-3 py-1 rounded-full">

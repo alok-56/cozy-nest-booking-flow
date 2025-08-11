@@ -1,311 +1,321 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Calendar, MapPin, Users, Download, Star, MessageCircle } from 'lucide-react';
+import { Calendar, MapPin, Users, Clock, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useToast } from '@/hooks/use-toast';
-import hotel1 from '@/assets/hotel-1.jpg';
-import hotel2 from '@/assets/hotel-2.jpg';
+import { Getmybooking } from '@/api/Services/api';
 
 const MyBookings = () => {
   const { toast } = useToast();
-  
-  const bookings = {
-    upcoming: [
-      {
-        id: 'HB001',
-        hotel: 'Grand Plaza Hotel',
-        location: 'New York, NY',
-        room: 'Deluxe Room',
-        checkIn: '2024-03-15',
-        checkOut: '2024-03-18',
-        guests: 2,
-        nights: 3,
-        total: 597,
-        status: 'confirmed',
-        image: hotel1,
-        bookingDate: '2024-02-15',
-      },
-      {
-        id: 'HB002',
-        hotel: 'Ocean View Resort',
-        location: 'Miami, FL',
-        room: 'Executive Suite',
-        checkIn: '2024-04-10',
-        checkOut: '2024-04-14',
-        guests: 3,
-        nights: 4,
-        total: 1196,
-        status: 'confirmed',
-        image: hotel2,
-        bookingDate: '2024-02-20',
-      },
-    ],
-    past: [
-      {
-        id: 'HB003',
-        hotel: 'Urban Loft Hotel',
-        location: 'Chicago, IL',
-        room: 'Standard Room',
-        checkIn: '2024-01-05',
-        checkOut: '2024-01-08',
-        guests: 2,
-        nights: 3,
-        total: 447,
-        status: 'completed',
-        image: hotel1,
-        bookingDate: '2023-12-20',
-        rating: 5,
-      },
-    ],
-    cancelled: [
-      {
-        id: 'HB004',
-        hotel: 'Mountain Resort',
-        location: 'Denver, CO',
-        room: 'Mountain View Suite',
-        checkIn: '2024-02-01',
-        checkOut: '2024-02-05',
-        guests: 4,
-        nights: 4,
-        total: 800,
-        status: 'cancelled',
-        image: hotel2,
-        bookingDate: '2024-01-10',
-        cancelledDate: '2024-01-25',
-      },
-    ],
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [hasSearched, setHasSearched] = useState(false);
+
+  const searchBookings = async () => {
+    if (!phoneNumber.trim()) {
+      toast({
+        title: "Phone Number Required",
+        description: "Please enter your phone number to search bookings",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await Getmybooking(phoneNumber);
+      if (response.status) {
+        setBookings(response.data || []);
+        setHasSearched(true);
+        if (response.data?.length === 0) {
+          toast({
+            title: "No Bookings Found",
+            description: "No bookings found for this phone number",
+          });
+        }
+      } else {
+        throw new Error(response.message || 'Failed to fetch bookings');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch bookings. Please try again.",
+        variant: "destructive",
+      });
+      setBookings([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      confirmed: { label: 'Confirmed', variant: 'default' as const },
-      completed: { label: 'Completed', variant: 'secondary' as const },
-      cancelled: { label: 'Cancelled', variant: 'destructive' as const },
+    const statusMap = {
+      'pending': { variant: 'secondary' as const, label: 'Pending' },
+      'booked': { variant: 'default' as const, label: 'Confirmed' },
+      'checkin': { variant: 'default' as const, label: 'Checked In' },
+      'checkout': { variant: 'outline' as const, label: 'Completed' },
+      'cancelled': { variant: 'destructive' as const, label: 'Cancelled' },
+      'failed': { variant: 'destructive' as const, label: 'Failed' }
     };
     
-    const config = statusConfig[status as keyof typeof statusConfig];
+    const config = statusMap[status as keyof typeof statusMap] || { variant: 'secondary' as const, label: status };
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
-  const downloadInvoice = (bookingId: string) => {
-    toast({
-      title: "Downloading Invoice",
-      description: `Invoice for booking ${bookingId} will be downloaded shortly.`,
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
     });
   };
 
-  const BookingCard = ({ booking, showActions = true }: { booking: any; showActions?: boolean }) => (
+  const categorizeBookings = () => {
+    const now = new Date();
+    const upcoming = bookings.filter(booking => 
+      ['booked', 'pending'].includes(booking.status) && 
+      new Date(booking.checkInDate) > now
+    );
+    const past = bookings.filter(booking => 
+      ['checkout'].includes(booking.status) || 
+      (['booked', 'checkin'].includes(booking.status) && new Date(booking.checkOutDate) < now)
+    );
+    const cancelled = bookings.filter(booking => 
+      ['cancelled', 'failed'].includes(booking.status)
+    );
+
+    return { upcoming, past, cancelled };
+  };
+
+  const { upcoming, past, cancelled } = categorizeBookings();
+
+  const BookingCard = ({ booking }: { booking: any }) => (
     <Card className="hotel-card hover-lift">
       <CardContent className="p-6">
-        <div className="flex gap-6">
-          <img 
-            src={booking.image} 
-            alt={booking.hotel}
-            className="w-32 h-24 object-cover rounded-lg flex-shrink-0"
-          />
-          
-          <div className="flex-1 space-y-3">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-xl font-semibold">{booking.hotel}</h3>
-                <div className="flex items-center text-muted-foreground mt-1">
-                  <MapPin className="w-4 h-4 mr-1" />
-                  <span>{booking.location}</span>
-                </div>
-              </div>
-              {getStatusBadge(booking.status)}
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h3 className="text-xl font-semibold mb-1">{booking.hotelId?.hotelName || 'Hotel Name'}</h3>
+            <div className="flex items-center text-muted-foreground text-sm">
+              <MapPin className="w-4 h-4 mr-1" />
+              <span>{booking.hotelId?.city}, {booking.hotelId?.state}</span>
             </div>
-            
-            <div className="grid md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium">Room: </span>
-                <span>{booking.room}</span>
-              </div>
-              <div>
-                <span className="font-medium">Booking ID: </span>
-                <span className="font-mono">{booking.id}</span>
-              </div>
-              <div className="flex items-center">
-                <Calendar className="w-4 h-4 mr-1" />
-                <span>{booking.checkIn} to {booking.checkOut}</span>
-              </div>
-              <div className="flex items-center">
-                <Users className="w-4 h-4 mr-1" />
-                <span>{booking.guests} guests, {booking.nights} nights</span>
-              </div>
+          </div>
+          {getStatusBadge(booking.status)}
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-4 mb-4">
+          <div className="flex items-center">
+            <Calendar className="w-4 h-4 mr-2 text-primary" />
+            <div>
+              <div className="text-sm text-muted-foreground">Check-in</div>
+              <div className="font-medium">{formatDate(booking.checkInDate)}</div>
             </div>
-            
-            {booking.rating && (
-              <div className="flex items-center">
-                <span className="text-sm font-medium mr-2">Your Rating:</span>
-                <div className="flex">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-4 h-4 ${
-                        i < booking.rating ? 'text-yellow-500 fill-current' : 'text-gray-300'
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            <div className="flex justify-between items-center pt-2 border-t">
-              <div>
-                <span className="text-2xl font-bold text-primary">${booking.total}</span>
-                <span className="text-muted-foreground text-sm ml-1">total</span>
-              </div>
-              
-              {showActions && (
-                <div className="flex space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => downloadInvoice(booking.id)}
-                  >
-                    <Download className="w-4 h-4 mr-1" />
-                    Invoice
-                  </Button>
-                  
-                  {booking.status === 'confirmed' && (
-                    <Button size="sm" className="primary-gradient">
-                      Modify
-                    </Button>
-                  )}
-                  
-                  {booking.status === 'completed' && !booking.rating && (
-                    <Button size="sm" variant="outline">
-                      <Star className="w-4 h-4 mr-1" />
-                      Rate Stay
-                    </Button>
-                  )}
-                  
-                  <Button size="sm" variant="outline">
-                    <MessageCircle className="w-4 h-4 mr-1" />
-                    Support
-                  </Button>
-                </div>
-              )}
+          </div>
+          <div className="flex items-center">
+            <Calendar className="w-4 h-4 mr-2 text-primary" />
+            <div>
+              <div className="text-sm text-muted-foreground">Check-out</div>
+              <div className="font-medium">{formatDate(booking.checkOutDate)}</div>
             </div>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-4 mb-4">
+          <div className="flex items-center">
+            <Users className="w-4 h-4 mr-2 text-primary" />
+            <span className="text-sm">
+              {booking.guests?.adults || 1} Adult{(booking.guests?.adults || 1) > 1 ? 's' : ''}
+              {booking.guests?.children > 0 && `, ${booking.guests.children} Child${booking.guests.children > 1 ? 'ren' : ''}`}
+            </span>
+          </div>
+          <div className="flex items-center">
+            <Clock className="w-4 h-4 mr-2 text-primary" />
+            <span className="text-sm">{booking.stayDuration || 1} Night{(booking.stayDuration || 1) > 1 ? 's' : ''}</span>
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <div className="text-sm text-muted-foreground mb-1">Booking ID</div>
+          <div className="font-mono text-sm">{booking.bookingId}</div>
+        </div>
+
+        <div className="mb-4">
+          <div className="text-sm text-muted-foreground mb-1">Room Types</div>
+          <div className="text-sm">
+            {booking.roomId?.map((room: any, index: number) => (
+              <span key={room._id}>
+                {room.roomType}
+                {index < booking.roomId.length - 1 && ', '}
+              </span>
+            )) || 'Room details unavailable'}
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center pt-4 border-t">
+          <div>
+            <div className="text-sm text-muted-foreground">Total Amount</div>
+            <div className="text-xl font-bold text-primary">₹{booking.totalAmount}</div>
+          </div>
+          <div className="flex space-x-2">
+            <Button variant="outline" size="sm">
+              <Eye className="w-4 h-4 mr-1" />
+              View Details
+            </Button>
           </div>
         </div>
       </CardContent>
     </Card>
   );
 
-  const totalBookings = bookings.upcoming.length + bookings.past.length + bookings.cancelled.length;
-  const totalSpent = [...bookings.upcoming, ...bookings.past].reduce((sum, booking) => sum + booking.total, 0);
-
   return (
     <div className="min-h-screen">
       <Header />
       
-      <div className="container mx-auto px-4 py-8">
-        {/* Header Stats */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-6">My Bookings</h1>
-          
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <Card className="hotel-card">
-              <CardContent className="p-6 text-center">
-                <h3 className="text-2xl font-bold text-primary">{totalBookings}</h3>
-                <p className="text-muted-foreground">Total Bookings</p>
-              </CardContent>
-            </Card>
-            
-            <Card className="hotel-card">
-              <CardContent className="p-6 text-center">
-                <h3 className="text-2xl font-bold text-primary">{bookings.upcoming.length}</h3>
-                <p className="text-muted-foreground">Upcoming Trips</p>
-              </CardContent>
-            </Card>
-            
-            <Card className="hotel-card">
-              <CardContent className="p-6 text-center">
-                <h3 className="text-2xl font-bold text-primary">${totalSpent.toLocaleString()}</h3>
-                <p className="text-muted-foreground">Total Spent</p>
-              </CardContent>
-            </Card>
-          </div>
+      {/* Hero Section */}
+      <section className="py-20 hero-gradient text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">
+            My Bookings
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto animate-slide-up">
+            Manage and track all your hotel bookings in one place
+          </p>
         </div>
+      </section>
 
-        {/* Bookings Tabs */}
-        <Tabs defaultValue="upcoming" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-md">
-            <TabsTrigger value="upcoming">
-              Upcoming ({bookings.upcoming.length})
-            </TabsTrigger>
-            <TabsTrigger value="past">
-              Past ({bookings.past.length})
-            </TabsTrigger>
-            <TabsTrigger value="cancelled">
-              Cancelled ({bookings.cancelled.length})
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="upcoming" className="space-y-4">
-            {bookings.upcoming.length > 0 ? (
-              bookings.upcoming.map((booking, index) => (
-                <div key={booking.id} className="animate-scale-in" style={{ animationDelay: `${index * 0.1}s` }}>
-                  <BookingCard booking={booking} />
+      {/* Search Section */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <Card className="hotel-card max-w-md mx-auto">
+            <CardContent className="p-6">
+              <h3 className="text-xl font-semibold mb-4 text-center">Find Your Bookings</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Phone Number</label>
+                  <Input
+                    type="tel"
+                    placeholder="Enter your phone number"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && searchBookings()}
+                  />
                 </div>
-              ))
-            ) : (
-              <Card className="hotel-card">
-                <CardContent className="p-8 text-center">
-                  <h3 className="text-xl font-semibold mb-2">No Upcoming Bookings</h3>
-                  <p className="text-muted-foreground mb-4">Ready to plan your next adventure?</p>
-                  <Link to="/hotels">
-                    <Button className="primary-gradient">
-                      Browse Hotels
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
+                <Button 
+                  onClick={searchBookings}
+                  className="w-full primary-gradient hover-lift"
+                  disabled={loading}
+                >
+                  {loading ? 'Searching...' : 'Search Bookings'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
 
-          <TabsContent value="past" className="space-y-4">
-            {bookings.past.length > 0 ? (
-              bookings.past.map((booking, index) => (
-                <div key={booking.id} className="animate-scale-in" style={{ animationDelay: `${index * 0.1}s` }}>
-                  <BookingCard booking={booking} />
+      {/* Bookings Results */}
+      {hasSearched && (
+        <section className="py-20 bg-muted/30">
+          <div className="container mx-auto px-4">
+            {bookings.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="bg-muted rounded-lg p-8 max-w-md mx-auto">
+                  <h3 className="text-xl font-semibold mb-2">No Bookings Found</h3>
+                  <p className="text-muted-foreground mb-4">
+                    We couldn't find any bookings for this phone number.
+                  </p>
+                  <Button onClick={() => window.location.href = '/hotels'}>
+                    Browse Hotels
+                  </Button>
                 </div>
-              ))
+              </div>
             ) : (
-              <Card className="hotel-card">
-                <CardContent className="p-8 text-center">
-                  <h3 className="text-xl font-semibold mb-2">No Past Bookings</h3>
-                  <p className="text-muted-foreground">Your travel history will appear here.</p>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
+              <>
+                {/* Summary Stats */}
+                <div className="grid md:grid-cols-3 gap-6 mb-12">
+                  <Card className="hotel-card text-center">
+                    <CardContent className="p-6">
+                      <div className="text-3xl font-bold text-primary mb-2">{bookings.length}</div>
+                      <div className="text-muted-foreground">Total Bookings</div>
+                    </CardContent>
+                  </Card>
+                  <Card className="hotel-card text-center">
+                    <CardContent className="p-6">
+                      <div className="text-3xl font-bold text-primary mb-2">{upcoming.length}</div>
+                      <div className="text-muted-foreground">Upcoming Trips</div>
+                    </CardContent>
+                  </Card>
+                  <Card className="hotel-card text-center">
+                    <CardContent className="p-6">
+                      <div className="text-3xl font-bold text-primary mb-2">
+                        ₹{bookings.reduce((sum, booking) => sum + (booking.totalAmount || 0), 0).toLocaleString()}
+                      </div>
+                      <div className="text-muted-foreground">Total Spent</div>
+                    </CardContent>
+                  </Card>
+                </div>
 
-          <TabsContent value="cancelled" className="space-y-4">
-            {bookings.cancelled.length > 0 ? (
-              bookings.cancelled.map((booking, index) => (
-                <div key={booking.id} className="animate-scale-in" style={{ animationDelay: `${index * 0.1}s` }}>
-                  <BookingCard booking={booking} showActions={false} />
-                </div>
-              ))
-            ) : (
-              <Card className="hotel-card">
-                <CardContent className="p-8 text-center">
-                  <h3 className="text-xl font-semibold mb-2">No Cancelled Bookings</h3>
-                  <p className="text-muted-foreground">Great! You haven't cancelled any bookings.</p>
-                </CardContent>
-              </Card>
+                {/* Bookings Tabs */}
+                <Tabs defaultValue="upcoming" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3 mb-8">
+                    <TabsTrigger value="upcoming">Upcoming ({upcoming.length})</TabsTrigger>
+                    <TabsTrigger value="past">Past ({past.length})</TabsTrigger>
+                    <TabsTrigger value="cancelled">Cancelled ({cancelled.length})</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="upcoming" className="space-y-6">
+                    {upcoming.length === 0 ? (
+                      <div className="text-center py-12">
+                        <h3 className="text-xl font-semibold mb-2">No Upcoming Bookings</h3>
+                        <p className="text-muted-foreground mb-4">Ready to plan your next trip?</p>
+                        <Button onClick={() => window.location.href = '/hotels'}>
+                          Book Your Next Stay
+                        </Button>
+                      </div>
+                    ) : (
+                      upcoming.map((booking) => (
+                        <BookingCard key={booking._id} booking={booking} />
+                      ))
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="past" className="space-y-6">
+                    {past.length === 0 ? (
+                      <div className="text-center py-12">
+                        <h3 className="text-xl font-semibold mb-2">No Past Bookings</h3>
+                        <p className="text-muted-foreground">Your completed trips will appear here.</p>
+                      </div>
+                    ) : (
+                      past.map((booking) => (
+                        <BookingCard key={booking._id} booking={booking} />
+                      ))
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="cancelled" className="space-y-6">
+                    {cancelled.length === 0 ? (
+                      <div className="text-center py-12">
+                        <h3 className="text-xl font-semibold mb-2">No Cancelled Bookings</h3>
+                        <p className="text-muted-foreground">Your cancelled bookings will appear here.</p>
+                      </div>
+                    ) : (
+                      cancelled.map((booking) => (
+                        <BookingCard key={booking._id} booking={booking} />
+                      ))
+                    )}
+                  </TabsContent>
+                </Tabs>
+              </>
             )}
-          </TabsContent>
-        </Tabs>
-      </div>
+          </div>
+        </section>
+      )}
 
       <Footer />
     </div>

@@ -2,12 +2,16 @@ import { Building, Users, Globe, Shield, TrendingUp, Phone } from 'lucide-react'
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useToast } from '@/hooks/use-toast';
+import { createB2B } from '@/api/Services/api';
+import { useState } from 'react';
 
 const B2B = () => {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const benefits = [
     {
@@ -42,12 +46,39 @@ const B2B = () => {
     },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Request Submitted!",
-      description: "We'll contact you within 24 hours to discuss your corporate travel needs.",
-    });
+    setIsSubmitting(true);
+    
+    const formData = new FormData(e.target as HTMLFormElement);
+    const payload = {
+      name: formData.get('name') as string,
+      email: formData.get('email') as string,
+      phone: formData.get('phone') as string,
+      companyName: formData.get('companyName') as string,
+      companyWebsite: formData.get('companyWebsite') as string,
+      subject: formData.get('subject') as string,
+      message: formData.get('message') as string,
+      industry: formData.get('industry') as string,
+      companySize: formData.get('companySize') as string,
+    };
+
+    try {
+      await createB2B(payload);
+      toast({
+        title: "Request Submitted!",
+        description: "We'll contact you within 24 hours to discuss your corporate travel needs.",
+      });
+      (e.target as HTMLFormElement).reset();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to submit request. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -141,14 +172,14 @@ const B2B = () => {
                 </div>
                 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <Input placeholder="First Name" required />
-                    <Input placeholder="Last Name" required />
-                  </div>
-                  <Input placeholder="Company Name" required />
-                  <Input type="email" placeholder="Business Email" required />
-                  <Input type="tel" placeholder="Phone Number" required />
-                  <select className="w-full p-2 border rounded-lg" required>
+                  <Input name="name" placeholder="Name" required />
+                  <Input name="email" type="email" placeholder="Business Email" required />
+                  <Input name="phone" type="tel" placeholder="Phone Number" />
+                  <Input name="companyName" placeholder="Company Name" required />
+                  <Input name="companyWebsite" placeholder="Company Website" />
+                  <Input name="subject" placeholder="Subject" />
+                  <Input name="industry" placeholder="Industry" />
+                  <select name="companySize" className="w-full p-2 border rounded-lg">
                     <option value="">Company Size</option>
                     <option value="1-10">1-10 employees</option>
                     <option value="11-50">11-50 employees</option>
@@ -156,13 +187,17 @@ const B2B = () => {
                     <option value="201-1000">201-1000 employees</option>
                     <option value="1000+">1000+ employees</option>
                   </select>
-                  <textarea
+                  <Textarea
+                    name="message"
                     placeholder="Tell us about your travel needs..."
                     rows={4}
-                    className="w-full p-2 border rounded-lg resize-none"
                   />
-                  <Button type="submit" className="w-full primary-gradient hover-lift">
-                    Request Demo
+                  <Button 
+                    type="submit" 
+                    className="w-full primary-gradient hover-lift"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Submitting...' : 'Request Demo'}
                   </Button>
                 </form>
               </Card>

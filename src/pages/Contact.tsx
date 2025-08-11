@@ -2,24 +2,28 @@ import { Phone, Mail, MapPin, Clock, MessageCircle, Headphones } from 'lucide-re
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useToast } from '@/hooks/use-toast';
+import { createContact } from '@/api/Services/api';
+import { useState } from 'react';
 
 const Contact = () => {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const contactMethods = [
     {
       icon: Phone,
       title: '24/7 Phone Support',
-      details: '+1 (555) 123-4567',
+      details: '+91 6291321220',
       description: 'Speak directly with our travel experts anytime',
     },
     {
       icon: Mail,
       title: 'Email Support',
-      details: 'support@hotelbook.com',
+      details: 'connect@brillrooms.com',
       description: 'Get detailed assistance via email',
     },
   ];
@@ -45,12 +49,35 @@ const Contact = () => {
     },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Message Sent!",
-      description: "We'll get back to you within 24 hours.",
-    });
+    setIsSubmitting(true);
+    
+    const formData = new FormData(e.target as HTMLFormElement);
+    const payload = {
+      name: formData.get('name') as string,
+      email: formData.get('email') as string,
+      phone: formData.get('phone') as string,
+      subject: formData.get('subject') as string,
+      message: formData.get('message') as string,
+    };
+
+    try {
+      await createContact(payload);
+      toast({
+        title: "Message Sent!",
+        description: "We'll get back to you within 24 hours.",
+      });
+      (e.target as HTMLFormElement).reset();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -105,52 +132,43 @@ const Contact = () => {
                 <CardContent className="p-8">
                   <h3 className="text-2xl font-bold mb-6">Send us a Message</h3>
                   
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-2">First Name *</label>
-                        <Input required />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Last Name *</label>
-                        <Input required />
-                      </div>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Name *</label>
+                      <Input name="name" required />
                     </div>
                     
                     <div>
                       <label className="block text-sm font-medium mb-2">Email *</label>
-                      <Input type="email" required />
+                      <Input name="email" type="email" required />
                     </div>
                     
                     <div>
                       <label className="block text-sm font-medium mb-2">Phone Number</label>
-                      <Input type="tel" />
+                      <Input name="phone" type="tel" />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium mb-2">Subject *</label>
-                      <select className="w-full p-2 border rounded-lg" required>
-                        <option value="">Select a subject</option>
-                        <option value="booking">Booking Support</option>
-                        <option value="technical">Technical Issue</option>
-                        <option value="business">Business Inquiry</option>
-                        <option value="feedback">Feedback</option>
-                        <option value="other">Other</option>
-                      </select>
+                      <label className="block text-sm font-medium mb-2">Subject</label>
+                      <Input name="subject" placeholder="Enter subject" />
                     </div>
                     
                     <div>
                       <label className="block text-sm font-medium mb-2">Message *</label>
-                      <textarea
+                      <Textarea
+                        name="message"
                         rows={6}
-                        className="w-full p-2 border rounded-lg resize-none"
                         placeholder="How can we help you?"
                         required
                       />
                     </div>
                     
-                    <Button type="submit" className="w-full primary-gradient hover-lift">
-                      Send Message
+                    <Button 
+                      type="submit" 
+                      className="w-full primary-gradient hover-lift"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'Sending...' : 'Send Message'}
                     </Button>
                   </form>
                 </CardContent>
