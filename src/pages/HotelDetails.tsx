@@ -420,6 +420,7 @@ const HotelDetails = () => {
                               
                               <div className="flex justify-between items-center">
                                 <div className="text-xs">
+                                  
                                   <span className={`font-medium ${availabilityColor}`}>
                                     {availabilityText}
                                   </span>

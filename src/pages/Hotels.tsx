@@ -101,7 +101,7 @@ const Hotels = () => {
         
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-2xl font-bold text-primary">${hotel.startingPrice || 199}</span>
+            <span className="text-2xl font-bold text-primary">₹{hotel.startingPrice || 999}</span>
             <span className="text-muted-foreground">/night</span>
           </div>
           <div className="text-right">
