@@ -174,7 +174,7 @@ const Privacy = () => {
                       <li><strong>Object:</strong> Object to certain types of data processing</li>
                     </ul>
                     <p className="mt-4">
-                      To exercise these rights, contact us at <strong>privacy@hotelbook.com</strong>
+                      To exercise these rights, contact us at <strong>privacy@Brills Rooms.com</strong>
                     </p>
                   </div>
                 </div>
@@ -234,17 +234,17 @@ const Privacy = () => {
                   </div>
                 </div>
 
-                <div className="bg-primary/5 p-6 rounded-lg">
+                {/* <div className="bg-primary/5 p-6 rounded-lg">
                   <h2 className="text-2xl font-bold mb-4">Contact Information</h2>
                   <div className="text-muted-foreground">
                     <p className="mb-2">
                       For privacy-related questions or concerns, contact our Data Protection Officer:
                     </p>
-                    <p><strong>Email:</strong> privacy@hotelbook.com</p>
+                    <p><strong>Email:</strong> privacy@Brills Rooms.com</p>
                     <p><strong>Address:</strong> 123 Business Ave, Suite 100, New York, NY 10001</p>
                     <p><strong>Phone:</strong> +1 (555) 123-4567</p>
                   </div>
-                </div>
+                </div> */}
               </CardContent>
             </Card>
           </div>

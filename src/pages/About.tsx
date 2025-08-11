@@ -53,7 +53,7 @@ const About = () => {
   ];
 
   const milestones = [
-    { year: '2018', title: 'Company Founded', description: 'HotelBook was founded with a vision to simplify hotel bookings.' },
+    { year: '2018', title: 'Company Founded', description: 'Brills Rooms was founded with a vision to simplify hotel bookings.' },
     { year: '2019', title: '10,000+ Hotels', description: 'Expanded our network to include over 10,000 properties worldwide.' },
     { year: '2020', title: '1M Bookings', description: 'Reached the milestone of 1 million successful bookings.' },
     { year: '2021', title: 'B2B Launch', description: 'Launched our B2B platform for corporate travel management.' },
@@ -69,7 +69,7 @@ const About = () => {
       <section className="py-20 hero-gradient text-white">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">
-            About HotelBook
+            About Brills Rooms
           </h1>
           <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto animate-slide-up">
             We're on a mission to make travel booking simple, transparent, and accessible for everyone. 
@@ -88,7 +88,7 @@ const About = () => {
                 <h2 className="text-4xl font-bold">Our Mission</h2>
               </div>
               <p className="text-lg leading-relaxed text-muted-foreground">
-                At HotelBook, we believe that everyone deserves access to amazing travel experiences. 
+                At Brills Rooms, we believe that everyone deserves access to amazing travel experiences. 
                 Our mission is to connect travelers with perfect accommodations while providing 
                 transparent pricing, reliable service, and exceptional customer support.
               </p>
@@ -173,7 +173,7 @@ const About = () => {
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 animate-fade-in">Meet Our Team</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto animate-slide-up">
-              The passionate people behind HotelBook's success
+              The passionate people behind Brills Rooms's success
             </p>
           </div>
           
@@ -227,7 +227,7 @@ const About = () => {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold mb-4">Join Our Journey</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Be part of the HotelBook community and experience the future of travel booking.
+            Be part of the Brills Rooms community and experience the future of travel booking.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="secondary-gradient text-foreground hover-lift">

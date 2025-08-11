@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Calendar, MapPin, Users, Clock, Eye } from 'lucide-react';
+import { Calendar, MapPin, Users, Clock, Eye, Phone, Mail, User, CreditCard, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useToast } from '@/hooks/use-toast';
@@ -16,6 +17,7 @@ const MyBookings = () => {
   const [loading, setLoading] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<any>(null);
 
   const searchBookings = async () => {
     if (!phoneNumber.trim()) {
@@ -38,6 +40,14 @@ const MyBookings = () => {
             title: "No Bookings Found",
             description: "No bookings found for this phone number",
           });
+        } else {
+          // Scroll to bookings section after successful search
+          setTimeout(() => {
+            const bookingsSection = document.getElementById('bookings-section');
+            if (bookingsSection) {
+              bookingsSection.scrollIntoView({ behavior: 'smooth' });
+            }
+          }, 100);
         }
       } else {
         throw new Error(response.message || 'Failed to fetch bookings');
@@ -57,7 +67,7 @@ const MyBookings = () => {
   const getStatusBadge = (status: string) => {
     const statusMap = {
       'pending': { variant: 'secondary' as const, label: 'Pending' },
-      'booked': { variant: 'default' as const, label: 'Confirmed' },
+      'booked': { variant: 'default' as const, label: 'Booked' },
       'checkin': { variant: 'default' as const, label: 'Checked In' },
       'checkout': { variant: 'outline' as const, label: 'Completed' },
       'cancelled': { variant: 'destructive' as const, label: 'Cancelled' },
@@ -73,6 +83,16 @@ const MyBookings = () => {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
+    });
+  };
+
+  const formatDateTime = (dateString: string) => {
+    return new Date(dateString).toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
@@ -94,6 +114,211 @@ const MyBookings = () => {
   };
 
   const { upcoming, past, cancelled } = categorizeBookings();
+
+  const BookingDetailsModal = ({ booking }: { booking: any }) => (
+    <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle className="flex items-center justify-between">
+          <span>Booking Details</span>
+          {getStatusBadge(booking.status)}
+        </DialogTitle>
+      </DialogHeader>
+      
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Hotel Information */}
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Hotel Information</h3>
+            <div className="space-y-2">
+              <div><strong>Name:</strong> {booking.hotelId?.hotelName || 'N/A'}</div>
+              <div><strong>Brand:</strong> {booking.hotelId?.brand || 'N/A'}</div>
+              <div><strong>Rating:</strong> {booking.hotelId?.starRating || 'N/A'} Star</div>
+              <div className="flex items-center">
+                <MapPin className="w-4 h-4 mr-1" />
+                <span>{booking.hotelId?.address}, {booking.hotelId?.city}, {booking.hotelId?.state}</span>
+              </div>
+              <div className="flex items-center">
+                <Phone className="w-4 h-4 mr-1" />
+                <span>{booking.hotelId?.phone}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Guest Information */}
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Guest Information</h3>
+            {booking.userInfo?.map((user: any, index: number) => (
+              <div key={index} className="bg-muted/50 rounded-lg p-3 mb-2">
+                <div className="flex items-center mb-1">
+                  <User className="w-4 h-4 mr-1" />
+                  <span className="font-medium">{user.name}</span>
+                </div>
+                <div className="text-sm text-muted-foreground space-y-1">
+                  <div className="flex items-center">
+                    <Phone className="w-3 h-3 mr-1" />
+                    <span>{user.phone}</span>
+                  </div>
+                  {user.email && (
+                    <div className="flex items-center">
+                      <Mail className="w-3 h-3 mr-1" />
+                      <span>{user.email}</span>
+                    </div>
+                  )}
+                  <div>Age: {user.age}, Gender: {user.gender}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Booking Details */}
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Booking Information</h3>
+            <div className="space-y-2">
+              <div><strong>Booking ID:</strong> <span className="font-mono">{booking.bookingId}</span></div>
+              <div><strong>Booking Type:</strong> {booking.bookingType}</div>
+              <div><strong>Check-in:</strong> {formatDateTime(booking.checkInDate)}</div>
+              <div><strong>Check-out:</strong> {formatDateTime(booking.checkOutDate)}</div>
+              <div><strong>Duration:</strong> {booking.stayDuration} Night{booking.stayDuration > 1 ? 's' : ''}</div>
+              <div className="flex items-center">
+                <Users className="w-4 h-4 mr-1" />
+                <span>{booking.guests?.adults || 1} Adult{(booking.guests?.adults || 1) > 1 ? 's' : ''}</span>
+                {booking.guests?.children > 0 && <span>, {booking.guests.children} Child{booking.guests.children > 1 ? 'ren' : ''}</span>}
+              </div>
+            </div>
+          </div>
+
+          {/* Room Details */}
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Room Details</h3>
+            {booking.roomId?.map((room: any, index: number) => (
+              <div key={room._id} className="bg-muted/50 rounded-lg p-3 mb-2">
+                <div className="font-medium">{room.roomType}</div>
+                <div className="text-sm text-muted-foreground">
+                  <div>Price: ₹{room.price}/night</div>
+                  <div>Size: {room.sizeSqm} sqm</div>
+                  <div>Bed: {room.bedType}</div>
+                  <div>Max Occupancy: {room.maxOccupancy}</div>
+                  {room.amenities && (
+                    <div>Amenities: {room.amenities.join(', ')}</div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Add-ons */}
+          {booking.addOns && booking.addOns.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Add-ons</h3>
+              <div className="space-y-2">
+                {booking.addOns.map((addon: any, index: number) => (
+                  <div key={index} className="flex justify-between items-center bg-muted/50 rounded p-2">
+                    <span>{addon.serviceName}</span>
+                    <span className="font-medium">₹{addon.cost}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Payment Information */}
+      <div className="mt-6 pt-6 border-t">
+        <h3 className="text-lg font-semibold mb-3">Payment Information</h3>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span>Subtotal:</span>
+              <span>₹{(booking.totalAmount - booking.taxAmount - (booking.addOns?.reduce((sum: number, addon: any) => sum + addon.cost, 0) || 0)).toLocaleString()}</span>
+            </div>
+            {booking.addOns && booking.addOns.length > 0 && (
+              <div className="flex justify-between">
+                <span>Add-ons:</span>
+                <span>₹{booking.addOns.reduce((sum: number, addon: any) => sum + addon.cost, 0).toLocaleString()}</span>
+              </div>
+            )}
+            <div className="flex justify-between">
+              <span>Tax:</span>
+              <span>₹{booking.taxAmount?.toLocaleString() || '0'}</span>
+            </div>
+            {booking.discountAmount > 0 && (
+              <div className="flex justify-between text-green-600">
+                <span>Discount:</span>
+                <span>-₹{booking.discountAmount.toLocaleString()}</span>
+              </div>
+            )}
+            <div className="flex justify-between font-bold text-lg border-t pt-2">
+              <span>Total Amount:</span>
+              <span>₹{booking.totalAmount?.toLocaleString()}</span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center">
+              <CreditCard className="w-4 h-4 mr-2" />
+              <span>Payment Method: {booking.paymentDetails?.method || 'N/A'}</span>
+            </div>
+            <div>Payment Status: <Badge variant={booking.paymentDetails?.status === 'paid' ? 'default' : 'secondary'}>{booking.paymentDetails?.status || 'N/A'}</Badge></div>
+            <div>Amount Paid: ₹{booking.amountPaid?.toLocaleString() || '0'}</div>
+            {booking.pendingAmount > 0 && (
+              <div className="text-orange-600">Pending Amount: ₹{booking.pendingAmount.toLocaleString()}</div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Status History */}
+      {booking.statusHistory && booking.statusHistory.length > 0 && (
+        <div className="mt-6 pt-6 border-t">
+          <h3 className="text-lg font-semibold mb-3">Status History</h3>
+          <div className="space-y-2">
+            {booking.statusHistory.map((history: any, index: number) => (
+              <div key={index} className="flex justify-between items-center bg-muted/50 rounded p-2">
+                <div>
+                  <span className="font-medium capitalize">{history.status}</span>
+                  {history.note && <span className="text-sm text-muted-foreground ml-2">- {history.note}</span>}
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  {formatDateTime(history.timestamp)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Hotel Policies */}
+      {booking.hotelId?.policies && (
+        <div className="mt-6 pt-6 border-t">
+          <h3 className="text-lg font-semibold mb-3">Hotel Policies</h3>
+          <div className="grid md:grid-cols-2 gap-4 text-sm">
+            <div>
+              <strong>Check-in:</strong> {booking.hotelId.policies.checkIn || 'N/A'}
+            </div>
+            <div>
+              <strong>Check-out:</strong> {booking.hotelId.policies.checkOut || 'N/A'}
+            </div>
+            <div>
+              <strong>Smoking:</strong> {booking.hotelId.policies.smokingPolicy || 'N/A'}
+            </div>
+            <div>
+              <strong>Pets:</strong> {booking.hotelId.policies.petPolicy === 'yes' ? 'Allowed' : 'Not Allowed'}
+            </div>
+          </div>
+          {booking.hotelId.policies.cancellationPolicy && (
+            <div className="mt-3">
+              <strong>Cancellation Policy:</strong>
+              <div className="text-sm text-muted-foreground mt-1 whitespace-pre-line">
+                {booking.hotelId.policies.cancellationPolicy}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </DialogContent>
+  );
 
   const BookingCard = ({ booking }: { booking: any }) => (
     <Card className="hotel-card hover-lift">
@@ -163,10 +388,15 @@ const MyBookings = () => {
             <div className="text-xl font-bold text-primary">₹{booking.totalAmount}</div>
           </div>
           <div className="flex space-x-2">
-            <Button variant="outline" size="sm">
-              <Eye className="w-4 h-4 mr-1" />
-              View Details
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" onClick={() => setSelectedBooking(booking)}>
+                  <Eye className="w-4 h-4 mr-1" />
+                  View Details
+                </Button>
+              </DialogTrigger>
+              <BookingDetailsModal booking={booking} />
+            </Dialog>
           </div>
         </div>
       </CardContent>
@@ -221,7 +451,7 @@ const MyBookings = () => {
 
       {/* Bookings Results */}
       {hasSearched && (
-        <section className="py-20 bg-muted/30">
+        <section id="bookings-section" className="py-20 bg-muted/30">
           <div className="container mx-auto px-4">
             {bookings.length === 0 ? (
               <div className="text-center py-12">

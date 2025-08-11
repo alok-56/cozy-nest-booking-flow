@@ -77,7 +77,7 @@ const Terms = () => {
                   </h2>
                   <div className="text-muted-foreground space-y-4">
                     <p>
-                      By accessing and using HotelBook's website, mobile application, or services, you agree 
+                      By accessing and using Brills Rooms's website, mobile application, or services, you agree 
                       to be bound by these Terms and Conditions. If you do not agree with these terms, 
                       please do not use our services.
                     </p>
@@ -202,7 +202,7 @@ const Terms = () => {
                   <h2 className="text-2xl font-bold mb-4">7. Limitation of Liability</h2>
                   <div className="text-muted-foreground space-y-4">
                     <p>
-                      HotelBook acts as an intermediary between you and accommodation providers. Our liability is limited to:
+                      Brills Rooms acts as an intermediary between you and accommodation providers. Our liability is limited to:
                     </p>
                     <ul className="list-disc list-inside space-y-2">
                       <li>The total amount paid for your booking</li>
@@ -266,17 +266,17 @@ const Terms = () => {
                   </div>
                 </div>
 
-                <div className="bg-primary/5 p-6 rounded-lg">
+                {/* <div className="bg-primary/5 p-6 rounded-lg">
                   <h2 className="text-2xl font-bold mb-4">Contact Information</h2>
                   <div className="text-muted-foreground">
                     <p className="mb-2">
                       For questions about these Terms and Conditions, contact us:
                     </p>
-                    <p><strong>Email:</strong> legal@hotelbook.com</p>
+                    <p><strong>Email:</strong> legal@Brills Rooms.com</p>
                     <p><strong>Address:</strong> 123 Business Ave, Suite 100, New York, NY 10001</p>
                     <p><strong>Phone:</strong> +1 (555) 123-4567</p>
                   </div>
-                </div>
+                </div> */}
               </CardContent>
             </Card>
           </div>

@@ -11,24 +11,24 @@ const Footer = () => {
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <div className="w-10 h-10 primary-gradient rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">H</span>
+                <span className="text-white font-bold text-xl">B</span>
               </div>
               <span className="text-xl font-bold">Brills Rooms</span>
             </div>
             <p className="text-gray-400 leading-relaxed">
               We are a leading hotel booking platform dedicated to providing exceptional travel experiences with Brills Rooms.
             </p>
-            <div className="flex space-x-4">
-              <a href="https://facebook.com/hotelbook" className="text-gray-400 hover:text-primary transition-colors">
+            {/* <div className="flex space-x-4">
+              <a href="https://facebook.com/Brills Rooms" className="text-gray-400 hover:text-primary transition-colors">
                 <Facebook size={20} />
               </a>
-              <a href="https://twitter.com/hotelbook" className="text-gray-400 hover:text-primary transition-colors">
+              <a href="https://twitter.com/Brills Rooms" className="text-gray-400 hover:text-primary transition-colors">
                 <Twitter size={20} />
               </a>
-              <a href="https://instagram.com/hotelbook" className="text-gray-400 hover:text-primary transition-colors">
+              <a href="https://instagram.com/Brills Rooms" className="text-gray-400 hover:text-primary transition-colors">
                 <Instagram size={20} />
               </a>
-            </div>
+            </div> */}
           </div>
 
           {/* Quick Links */}

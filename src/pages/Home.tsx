@@ -9,12 +9,14 @@ import Footer from "@/components/Footer";
 
 import heroImage from "@/assets/hero-hotel.jpg";
 import { getAllHotels } from '@/api/Services/api';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Home = () => {
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
 
   // Kolkata nearby places
   const kolkataNearbyPlaces = [
@@ -108,7 +110,7 @@ const Home = () => {
               <Button
                 size="lg"
                 className="secondary-gradient text-foreground hover-lift animate-scale-in"
-                onClick={() => console.log('Navigate to hotels page')}
+                onClick={() =>  navigate(`/hotels`)}
               >
                 Explore Hotels
               </Button>
@@ -127,7 +129,7 @@ const Home = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 animate-fade-in">
-              Why Choose HotelBook?
+              Why Choose Brills Rooms?
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto animate-slide-up">
               We provide the best hotel booking experience with unmatched

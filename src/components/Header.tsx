@@ -25,9 +25,9 @@ const Header = () => {
           {/* Logo */}
           <Link to="/home" className="flex items-center space-x-2">
             <div className="w-10 h-10 primary-gradient rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">H</span>
+              <span className="text-white font-bold text-xl">B</span>
             </div>
-            <span className="text-xl font-bold text-primary">HotelBook</span>
+            <span className="text-xl font-bold text-primary">Brills Rooms</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -50,7 +50,7 @@ const Header = () => {
             <a href="tel:+1 (555) 123-4567" className="text-muted-foreground hover:text-primary transition-colors">
               <Phone size={20} />
             </a>
-            <a href="mailto:contact@hotelbook.com" className="text-muted-foreground hover:text-primary transition-colors">
+            <a href="mailto:contact@Brills Rooms.com" className="text-muted-foreground hover:text-primary transition-colors">
               <Mail size={20} />
             </a>
             <Link to="/my-bookings">

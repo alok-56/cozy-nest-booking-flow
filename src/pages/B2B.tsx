@@ -7,11 +7,12 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useToast } from '@/hooks/use-toast';
 import { createB2B } from '@/api/Services/api';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 const B2B = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const formRef = useRef(null);
 
   const benefits = [
     {
@@ -46,21 +47,28 @@ const B2B = () => {
     },
   ];
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const scrollToForm = () => {
+    formRef.current?.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    const formData = new FormData(e.target as HTMLFormElement);
+    const formData = new FormData(e.target);
     const payload = {
-      name: formData.get('name') as string,
-      email: formData.get('email') as string,
-      phone: formData.get('phone') as string,
-      companyName: formData.get('companyName') as string,
-      companyWebsite: formData.get('companyWebsite') as string,
-      subject: formData.get('subject') as string,
-      message: formData.get('message') as string,
-      industry: formData.get('industry') as string,
-      companySize: formData.get('companySize') as string,
+      name: formData.get('name'),
+      email: formData.get('email'),
+      phone: formData.get('phone'),
+      companyName: formData.get('companyName'),
+      companyWebsite: formData.get('companyWebsite'),
+      subject: formData.get('subject'),
+      message: formData.get('message'),
+      industry: formData.get('industry'),
+      companySize: formData.get('companySize'),
     };
 
     try {
@@ -69,7 +77,7 @@ const B2B = () => {
         title: "Request Submitted!",
         description: "We'll contact you within 24 hours to discuss your corporate travel needs.",
       });
-      (e.target as HTMLFormElement).reset();
+      e.target.reset();
     } catch (error) {
       toast({
         title: "Error",
@@ -95,7 +103,11 @@ const B2B = () => {
             Streamline your corporate travel with our comprehensive B2B platform. 
             Save time, reduce costs, and ensure seamless business travel experiences.
           </p>
-          <Button size="lg" className="secondary-gradient text-foreground hover-lift animate-scale-in">
+          <Button 
+            size="lg" 
+            className="secondary-gradient text-foreground hover-lift animate-scale-in"
+            onClick={scrollToForm}
+          >
             Get Started Today
           </Button>
         </div>
@@ -164,7 +176,7 @@ const B2B = () => {
               </div>
             </div>
             
-            <div className="animate-slide-up">
+            <div className="animate-slide-up" ref={formRef}>
               <Card className="hotel-card p-8">
                 <div className="text-center mb-6">
                   <h3 className="text-2xl font-bold mb-2">Ready to Get Started?</h3>
@@ -205,8 +217,6 @@ const B2B = () => {
           </div>
         </div>
       </section>
-
-      
 
       <Footer />
     </div>
