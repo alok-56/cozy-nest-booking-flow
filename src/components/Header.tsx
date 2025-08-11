@@ -59,12 +59,7 @@ const Header = () => {
                 My Bookings
               </Button>
             </Link>
-            <Link to="/cart">
-              <Button variant="outline" size="sm">
-                <ShoppingCart size={16} className="mr-2" />
-                Cart
-              </Button>
-            </Link>
+           
           </div>
 
           {/* Mobile Menu Button */}
@@ -99,12 +94,12 @@ const Header = () => {
                     My Bookings
                   </Button>
                 </Link>
-                <Link to="/cart" onClick={() => setIsMobileMenuOpen(false)}>
+                {/* <Link to="/cart" onClick={() => setIsMobileMenuOpen(false)}>
                   <Button variant="outline" size="sm" className="w-full justify-start">
                     <ShoppingCart size={16} className="mr-2" />
                     Cart
                   </Button>
-                </Link>
+                </Link> */}
               </div>
             </nav>
           </div>

@@ -62,3 +62,47 @@ export const Validatepayments = async (merchantTransactionId) => {
 
   return data;
 };
+
+// booking using merchant transaction ID
+export const Getbookingstatus = async (id: any): Promise<any> => {
+  const res = await fetch(`${BASEURL}/booking/check/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await res.json();
+
+  return data;
+};
+
+// create b2b
+export const createB2B = async (payload: any): Promise<any> => {
+  const res = await fetch(`${BASEURL}/public/b2b`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json();
+
+  return data;
+};
+
+// create contact
+export const createContact = async (payload: any): Promise<any> => {
+  const res = await fetch(`${BASEURL}/public/contact-us`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json();
+
+  return data;
+};

@@ -50,8 +50,8 @@ const Footer = () => {
               <li><Link to="/contact" className="text-gray-400 hover:text-white transition-colors">Contact Us</Link></li>
               <li><Link to="/privacy" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</Link></li>
               <li><Link to="/terms" className="text-gray-400 hover:text-white transition-colors">Terms & Conditions</Link></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Help Center</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Cancellation</a></li>
+              {/* <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Help Center</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Cancellation</a></li> */}
             </ul>
           </div>
 

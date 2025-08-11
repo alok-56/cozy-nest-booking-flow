@@ -65,8 +65,9 @@ const Hotels = () => {
   const HotelCard = ({ hotel, isListView = false }: { hotel: any; isListView?: boolean }) => (
     <Card className={`hotel-card hover-lift overflow-hidden animate-scale-in ${isListView ? 'flex-row flex' : ''}`}>
       <div className={`relative ${isListView ? 'w-80 flex-shrink-0' : ''}`}>
+       
         <img 
-          src={hotel.images?.[0] || hotel1} 
+          src={hotel?.images?.hotel[0]?.url} 
           alt={hotel.name} 
           className={`object-cover ${isListView ? 'w-full h-full' : 'w-full h-64'}`} 
         />
@@ -104,7 +105,7 @@ const Hotels = () => {
             <span className="text-muted-foreground">/night</span>
           </div>
           <div className="text-right">
-            <div className="text-sm text-muted-foreground">{hotel.reviews || 150} reviews</div>
+            <div className="text-sm text-muted-foreground">{hotel.reviews || 0} reviews</div>
             <Link to={`/hotel/${hotel._id}`}>
               <Button className="mt-2 primary-gradient hover-lift">
                 View Details
@@ -139,7 +140,7 @@ const Hotels = () => {
               </p>
             </div>
             
-            <div className="flex items-center space-x-4">
+            {/* <div className="flex items-center space-x-4">
               <Select defaultValue="recommended">
                 <SelectTrigger className="w-48">
                   <SelectValue placeholder="Sort by" />
@@ -176,7 +177,7 @@ const Hotels = () => {
                   <List className="w-4 h-4" />
                 </Button>
               </div>
-            </div>
+            </div> */}
           </div>
 
           <div className="flex gap-8">

@@ -22,12 +22,6 @@ const Contact = () => {
       details: 'support@hotelbook.com',
       description: 'Get detailed assistance via email',
     },
-    {
-      icon: MessageCircle,
-      title: 'Live Chat',
-      details: 'Available 24/7',
-      description: 'Instant help through our website chat',
-    },
   ];
 
   const offices = [
@@ -212,7 +206,7 @@ const Contact = () => {
       </section>
 
       {/* Office Locations */}
-      <section className="py-20">
+      {/* <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 animate-fade-in">Our Offices</h2>
@@ -250,10 +244,10 @@ const Contact = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Emergency Support */}
-      <section className="py-20 hero-gradient text-white">
+      {/* <section className="py-20 hero-gradient text-white">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-2xl mx-auto">
             <Headphones className="w-16 h-16 mx-auto mb-6" />
@@ -274,7 +268,7 @@ const Contact = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       <Footer />
     </div>
