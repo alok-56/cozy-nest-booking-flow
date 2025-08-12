@@ -1,5 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { Star, Users, Shield, Clock, MapPin } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import {
+  Star,
+  Users,
+  Shield,
+  Clock,
+  MapPin,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 // import { Link } from "react-router-dom"; // Removed - not available in artifact environment
@@ -7,16 +15,59 @@ import SearchBox from "@/components/SearchBox";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-import heroImage from "@/assets/hero-hotel.jpg";
-import { getAllHotels } from '@/api/Services/api';
-import { Link, useNavigate } from 'react-router-dom';
+import heroImage from "@/assets/banner1.jpg";
+import heroImage2 from "@/assets/banner2.jpg";
+import heroImage3 from "@/assets/banner3.jpg";
+import heroImage4 from "@/assets/banner4.jpg";
+import heroImage5 from "@/assets/banner5.jpg";
+
+import { getAllHotels } from "@/api/Services/api";
+// import { Link, useNavigate } from "react-router-dom"; // Not available in artifacts
 
 const Home = () => {
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate(); // Not available in artifacts
+
+  // Hero carousel images - using high-quality hotel/travel images
+  const heroImages = [
+    heroImage, // Luxury hotel lobby
+    heroImage2,
+    heroImage3,
+    heroImage4,
+    heroImage5, // Scenic beach resort
+  ];
+
+  // Auto-change images every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) =>
+        prevIndex === heroImages.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
+
+  // Manual navigation functions
+  const goToPrevious = () => {
+    setCurrentImageIndex(
+      currentImageIndex === 0 ? heroImages.length - 1 : currentImageIndex - 1
+    );
+  };
+
+  const goToNext = () => {
+    setCurrentImageIndex(
+      currentImageIndex === heroImages.length - 1 ? 0 : currentImageIndex + 1
+    );
+  };
+
+  const goToSlide = (index) => {
+    setCurrentImageIndex(index);
+  };
 
   // Kolkata nearby places
   const kolkataNearbyPlaces = [
@@ -24,26 +75,30 @@ const Home = () => {
       name: "Victoria Memorial",
       type: "Historical Monument",
       distance: "2.5 km",
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop"
+      image:
+        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
     },
     {
       name: "Howrah Bridge",
       type: "Iconic Bridge",
       distance: "3.8 km",
-      image: "https://images.unsplash.com/photo-1571115764595-644a1f56a55c?w=400&h=300&fit=crop"
+      image:
+        "https://images.unsplash.com/photo-1571115764595-644a1f56a55c?w=400&h=300&fit=crop",
     },
     {
       name: "Park Street",
       type: "Shopping & Dining",
       distance: "1.2 km",
-      image: "https://images.unsplash.com/photo-1519817914152-22d216bb9170?w=400&h=300&fit=crop"
+      image:
+        "https://images.unsplash.com/photo-1519817914152-22d216bb9170?w=400&h=300&fit=crop",
     },
     {
       name: "Eden Gardens",
       type: "Cricket Stadium",
       distance: "4.1 km",
-      image: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&h=300&fit=crop"
-    }
+      image:
+        "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&h=300&fit=crop",
+    },
   ];
 
   // Fetch hotels from API
@@ -51,15 +106,11 @@ const Home = () => {
     const fetchHotels = async () => {
       try {
         setLoading(true);
-        let response=await getAllHotels()
+        let response = await getAllHotels();
 
-      
-
-       
-          setHotels(response.data.slice(0, 3));
-       
+        setHotels(response.data.slice(0, 3));
       } catch (err) {
-        console.error('Error fetching hotels:', err);
+        console.error("Error fetching hotels:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -84,15 +135,56 @@ const Home = () => {
     <div className="min-h-screen">
       <Header />
 
-      {/* Hero Section */}
-      <section className="relative h-screen">
-        {/* Background Image */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${heroImage})` }}
-        />
+      {/* Hero Section with Carousel */}
+      <section className="relative h-screen overflow-hidden">
+        {/* Carousel Images */}
+        <div className="absolute inset-0">
+          {heroImages.map((image, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-opacity duration-1000 ${
+                index === currentImageIndex ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <div
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                style={{ backgroundImage: `url(${image})` }}
+              />
+            </div>
+          ))}
+        </div>
+
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 hero-gradient" />
+        <div className="absolute inset-0 bg-black/40" />
+
+        {/* Navigation Arrows */}
+        <button
+          onClick={goToPrevious}
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 transition-all duration-300 text-white hover:scale-110"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+        <button
+          onClick={goToNext}
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 transition-all duration-300 text-white hover:scale-110"
+        >
+          <ChevronRight className="w-6 h-6" />
+        </button>
+
+        {/* Dots Indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex space-x-3">
+          {heroImages.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                index === currentImageIndex
+                  ? "bg-white scale-125"
+                  : "bg-white/50 hover:bg-white/70"
+              }`}
+            />
+          ))}
+        </div>
 
         {/* Content */}
         <div className="relative z-10 container mx-auto px-4 pt-56 text-white">
@@ -107,13 +199,13 @@ const Home = () => {
               adventure. Book with confidence and travel with ease.
             </p>
             {/* <Link to="/hotels"> */}
-              <Button
-                size="lg"
-                className="secondary-gradient text-foreground hover-lift animate-scale-in"
-                onClick={() =>  navigate(`/hotels`)}
-              >
-                Explore Hotels
-              </Button>
+            <Button
+              size="lg"
+              className="secondary-gradient text-foreground hover-lift animate-scale-in"
+              onClick={() => console.log("Navigate to hotels")}
+            >
+              Explore Hotels
+            </Button>
             {/* </Link> */}
           </div>
 
@@ -207,7 +299,7 @@ const Home = () => {
 
           <div className="grid md:grid-cols-4 gap-6">
             {kolkataNearbyPlaces.map((place, index) => (
-              <Card 
+              <Card
                 key={index}
                 className="hotel-card hover-lift overflow-hidden animate-scale-in"
                 style={{ animationDelay: `${index * 0.1}s` }}
@@ -263,10 +355,12 @@ const Home = () => {
           ) : error ? (
             <div className="text-center py-12">
               <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
-                <h3 className="text-red-800 font-semibold mb-2">Unable to load hotels</h3>
+                <h3 className="text-red-800 font-semibold mb-2">
+                  Unable to load hotels
+                </h3>
                 <p className="text-red-600 text-sm">{error}</p>
-                <Button 
-                  onClick={() => window.location.reload()} 
+                <Button
+                  onClick={() => window.location.reload()}
                   className="mt-4 bg-red-600 hover:bg-red-700"
                 >
                   Try Again
@@ -276,8 +370,8 @@ const Home = () => {
           ) : (
             <div className="grid md:grid-cols-3 gap-8">
               {hotels.map((hotel, index) => (
-                <Card 
-                  key={hotel._id} 
+                <Card
+                  key={hotel._id}
                   className="hotel-card hover-lift overflow-hidden animate-scale-in"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
@@ -293,7 +387,9 @@ const Home = () => {
                     <div className="absolute top-4 right-4 bg-white/90 px-3 py-1 rounded-full">
                       <div className="flex items-center space-x-1">
                         <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                        <span className="text-sm font-semibold">{hotel.starRating || 'N/A'}</span>
+                        <span className="text-sm font-semibold">
+                          {hotel.starRating || "N/A"}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -306,7 +402,9 @@ const Home = () => {
                     </p>
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <span className="text-sm text-muted-foreground">From</span>
+                        <span className="text-sm text-muted-foreground">
+                          From
+                        </span>
                         <div>
                           <span className="text-2xl font-bold text-primary">
                             ₹2,999
@@ -323,8 +421,8 @@ const Home = () => {
                     <div className="mb-4">
                       <div className="flex flex-wrap gap-1 mb-2">
                         {hotel.facilities?.slice(0, 3).map((facility, idx) => (
-                          <span 
-                            key={idx} 
+                          <span
+                            key={idx}
                             className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded"
                           >
                             {facility}
@@ -337,11 +435,11 @@ const Home = () => {
                         )}
                       </div>
                     </div>
-                    <Link to={`/hotel/${hotel._id}`}>
-                                  <Button className="mt-2 primary-gradient hover-lift">
-                                    View Details
-                                  </Button>
-                                </Link>
+                    <div onClick={() => console.log(`View hotel ${hotel._id}`)}>
+                      <Button className="mt-2 primary-gradient hover-lift">
+                        View Details
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -351,8 +449,12 @@ const Home = () => {
           {!loading && !error && hotels.length === 0 && (
             <div className="text-center py-12">
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 max-w-md mx-auto">
-                <h3 className="text-gray-800 font-semibold mb-2">No hotels available</h3>
-                <p className="text-gray-600 text-sm">Please check back later for available hotels.</p>
+                <h3 className="text-gray-800 font-semibold mb-2">
+                  No hotels available
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  Please check back later for available hotels.
+                </p>
               </div>
             </div>
           )}
