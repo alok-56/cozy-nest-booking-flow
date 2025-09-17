@@ -421,14 +421,14 @@ const HotelDetails = () => {
                               <div className="flex justify-between items-center">
                                 <div className="text-xs">
                                   
-                                  <span className={`font-medium ${availabilityColor}`}>
+                                  {/* <span className={`font-medium ${availabilityColor}`}>
                                     {availabilityText}
                                   </span>
                                   {isAvailable && room.availableUnits <= 3 && (
                                     <div className="text-orange-600 text-xs mt-1">
                                       Only {room.availableUnits} left!
                                     </div>
-                                  )}
+                                  )} */}
                                 </div>
                                 <div className="flex items-center space-x-2">
                                   {isAvailable && (
@@ -499,7 +499,7 @@ const HotelDetails = () => {
                               </div>
                               
                               <div className="flex justify-between items-center">
-                                <div className="text-sm">
+                                {/* <div className="text-sm">
                                   <span className={`font-medium ${availabilityColor}`}>
                                     {availabilityText}
                                   </span>
@@ -508,7 +508,7 @@ const HotelDetails = () => {
                                       Only {room.availableUnits} left!
                                     </div>
                                   )}
-                                </div>
+                                </div> */}
                                 <div className="flex items-center space-x-3">
                                   {isAvailable && (
                                     <div className="flex items-center space-x-2">
